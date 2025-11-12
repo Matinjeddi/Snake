@@ -30,6 +30,7 @@ let dy = 0;
 let food = {x: 0, y: 0};
 let score = 0;
 let level = 1;
+let highScore = 0;
 let gameOver = false;
 
 function getRandomFood() {
@@ -52,11 +53,11 @@ function resetGame() {
     speed = 6;
     gameOver = false;
     messageDisplay.textContent = '';
-    scoreDisplay.textContent = `Score: 0 | Level: 1`;
+    scoreDisplay.textContent = `Score: 0 | Level: 1 | High Score: ${highScore}`;
     updateBackground();
     getRandomFood();
 }
-/* make the apple round */
+
 function gameLoop() {
     requestAnimationFrame(gameLoop);
     if (gameOver) return;
@@ -70,12 +71,17 @@ function gameLoop() {
 
     if (head.x === food.x && head.y === food.y) {
         score += 10;
+        if (score > highScore) {
+        highScore = score;
+        localStorage.setItem('highScore', highScore);
+        }
+
         if (score % 50 === 0) {
             level++;
             updateBackground();
             if (speed > 2) speed--;
         }
-        scoreDisplay.textContent = `Score: ${score} | Level: ${level}`;
+        scoreDisplay.textContent = `Score: ${score} | Level: ${level} | High Score: ${highScore}`;
         getRandomFood();
     } else {
         snake.pop();
@@ -92,7 +98,7 @@ function gameLoop() {
     if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height ||
         snake.slice(1).some(seg => seg.x === head.x && seg.y === head.y)) {
         gameOver = true;
-        messageDisplay.textContent = `GAME OVER! Score: ${score}, Level: ${level}. Press R to restart.`;
+        messageDisplay.textContent = `GAME OVER! Score: ${score}, Level: ${level}. High Score: ${highScore}. Press R to restart.`;
     }
 }
 
