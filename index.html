@@ -39,7 +39,8 @@ function getRandomFood() {
 getRandomFood();
 
 function updateBackground() {
-    const colors = ['#000', '#111', '#222', '#333', '#444', '#555', '#666', '#777'];
+ /* add different shades of white as background */
+    const colors = ['#fff', '#eee', '#ddd', '#ccc', '#bbb', '#aaa', '#999', '#888'];
     const index = Math.min(level-1, colors.length-1);
     canvas.style.background = colors[index];
 }
