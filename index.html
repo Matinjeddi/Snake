@@ -86,14 +86,35 @@ function gameLoop() {
     } else {
         snake.pop();
     }
-    ctx.fillStyle = 'red';
+    // Draw apple
+    const appleX = food.x + grid/2;
+    const appleY = food.y + grid/2;
+
+    // Apple body (red with slight gradient effect using multiple circles)
+    ctx.fillStyle = '#cc0000';
     ctx.beginPath();
-    ctx.arc(food.x + grid/2, food.y + grid/2, grid/2, 0, Math.PI * 2);
+    ctx.arc(appleX, appleY, grid/2, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Highlight to make it look shiny
+    ctx.fillStyle = 'rgba(255, 100, 100, 0.6)';
+    ctx.beginPath();
+    ctx.arc(appleX - grid/6, appleY - grid/6, grid/4, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Brown stem
+    ctx.fillStyle = '#654321';
+    ctx.fillRect(appleX - 1, appleY - grid/2 - 3, 2, 4);
+
+    // Green leaf
+    ctx.fillStyle = '#228B22';
+    ctx.beginPath();
+    ctx.ellipse(appleX + 3, appleY - grid/2 - 2, 3, 2, Math.PI / 4, 0, Math.PI * 2);
     ctx.fill();
 
 
     // Draw snake body
-    ctx.fillStyle = 'lime';
+    ctx.fillStyle = '#00aa00';
     snake.slice(1).forEach(seg => ctx.fillRect(seg.x, seg.y, grid-1, grid-1));
 
     // Draw interactive snake head
