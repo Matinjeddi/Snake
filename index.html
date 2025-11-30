@@ -34,8 +34,20 @@ let highScore = 0;
 let gameOver = false;
 
 function getRandomFood() {
-    food.x = Math.floor(Math.random() * canvas.width / grid) * grid;
-    food.y = Math.floor(Math.random() * canvas.height / grid) * grid;
+    let newFood;
+    let isOnSnake;
+
+    // Keep generating new positions until we find one not on the snake
+    do {
+        newFood = {
+            x: Math.floor(Math.random() * canvas.width / grid) * grid,
+            y: Math.floor(Math.random() * canvas.height / grid) * grid
+        };
+        isOnSnake = snake.some(seg => seg.x === newFood.x && seg.y === newFood.y);
+    } while (isOnSnake);
+
+    food.x = newFood.x;
+    food.y = newFood.y;
 }
 getRandomFood();
 
