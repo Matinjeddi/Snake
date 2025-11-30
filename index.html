@@ -92,8 +92,67 @@ function gameLoop() {
     ctx.fill();
 
 
+    // Draw snake body
     ctx.fillStyle = 'lime';
-    snake.forEach(seg => ctx.fillRect(seg.x, seg.y, grid-1, grid-1));
+    snake.slice(1).forEach(seg => ctx.fillRect(seg.x, seg.y, grid-1, grid-1));
+
+    // Draw interactive snake head
+    const headX = snake[0].x;
+    const headY = snake[0].y;
+
+    // Head background (darker green)
+    ctx.fillStyle = '#00aa00';
+    ctx.fillRect(headX, headY, grid-1, grid-1);
+
+    // Determine eye positions based on direction
+    let eyeOffsetX1, eyeOffsetX2, eyeOffsetY1, eyeOffsetY2;
+    let tongueX, tongueY, tongueWidth, tongueHeight;
+
+    if (dx > 0) { // Moving right
+        eyeOffsetX1 = grid * 0.6; eyeOffsetX2 = grid * 0.6;
+        eyeOffsetY1 = grid * 0.25; eyeOffsetY2 = grid * 0.65;
+        tongueX = headX + grid - 1; tongueY = headY + grid/2 - 2;
+        tongueWidth = 6; tongueHeight = 4;
+    } else if (dx < 0) { // Moving left
+        eyeOffsetX1 = grid * 0.2; eyeOffsetX2 = grid * 0.2;
+        eyeOffsetY1 = grid * 0.25; eyeOffsetY2 = grid * 0.65;
+        tongueX = headX - 6; tongueY = headY + grid/2 - 2;
+        tongueWidth = 6; tongueHeight = 4;
+    } else if (dy > 0) { // Moving down
+        eyeOffsetX1 = grid * 0.25; eyeOffsetX2 = grid * 0.65;
+        eyeOffsetY1 = grid * 0.6; eyeOffsetY2 = grid * 0.6;
+        tongueX = headX + grid/2 - 2; tongueY = headY + grid - 1;
+        tongueWidth = 4; tongueHeight = 6;
+    } else { // Moving up
+        eyeOffsetX1 = grid * 0.25; eyeOffsetX2 = grid * 0.65;
+        eyeOffsetY1 = grid * 0.2; eyeOffsetY2 = grid * 0.2;
+        tongueX = headX + grid/2 - 2; tongueY = headY - 6;
+        tongueWidth = 4; tongueHeight = 6;
+    }
+
+    // Draw eyes (white with black pupils)
+    ctx.fillStyle = 'white';
+    ctx.beginPath();
+    ctx.arc(headX + eyeOffsetX1, headY + eyeOffsetY1, grid * 0.15, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(headX + eyeOffsetX2, headY + eyeOffsetY2, grid * 0.15, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Draw pupils
+    ctx.fillStyle = 'black';
+    ctx.beginPath();
+    ctx.arc(headX + eyeOffsetX1, headY + eyeOffsetY1, grid * 0.08, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(headX + eyeOffsetX2, headY + eyeOffsetY2, grid * 0.08, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Draw tongue (flickers)
+    if (count % 2 === 0) {
+        ctx.fillStyle = '#ff6666';
+        ctx.fillRect(tongueX, tongueY, tongueWidth, tongueHeight);
+    }
 
     if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height ||
         snake.slice(1).some(seg => seg.x === head.x && seg.y === head.y)) {
