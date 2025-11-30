@@ -113,9 +113,44 @@ function gameLoop() {
     ctx.fill();
 
 
-    // Draw snake body
+    // Draw snake body with rounded, connected segments
     ctx.fillStyle = '#00aa00';
-    snake.slice(1).forEach(seg => ctx.fillRect(seg.x, seg.y, grid-1, grid-1));
+    snake.slice(1).forEach((seg, index) => {
+        // Draw main segment with rounded corners
+        ctx.fillRect(seg.x + 1, seg.y + 1, grid - 2, grid - 2);
+
+        // Draw connectors to previous segment for smooth connection
+        if (index > 0) {
+            const prevSeg = snake.slice(1)[index - 1];
+            const nextSeg = seg;
+
+            // If segments are horizontal neighbors
+            if (Math.abs(prevSeg.x - nextSeg.x) === grid && prevSeg.y === nextSeg.y) {
+                const minX = Math.min(prevSeg.x, nextSeg.x);
+                ctx.fillRect(minX + grid/2 - 2, seg.y + 1, grid/2 + 4, grid - 2);
+            }
+            // If segments are vertical neighbors
+            else if (Math.abs(prevSeg.y - nextSeg.y) === grid && prevSeg.x === nextSeg.x) {
+                const minY = Math.min(prevSeg.y, nextSeg.y);
+                ctx.fillRect(seg.x + 1, minY + grid/2 - 2, grid - 2, grid/2 + 4);
+            }
+        }
+
+        // Also connect to head if this is the first body segment
+        if (index === 0) {
+            const head = snake[0];
+            // If horizontal neighbors
+            if (Math.abs(head.x - seg.x) === grid && head.y === seg.y) {
+                const minX = Math.min(head.x, seg.x);
+                ctx.fillRect(minX + grid/2 - 2, seg.y + 1, grid/2 + 4, grid - 2);
+            }
+            // If vertical neighbors
+            else if (Math.abs(head.y - seg.y) === grid && head.x === seg.x) {
+                const minY = Math.min(head.y, seg.y);
+                ctx.fillRect(seg.x + 1, minY + grid/2 - 2, grid - 2, grid/2 + 4);
+            }
+        }
+    });
 
     // Draw interactive snake head
     const headX = snake[0].x;
@@ -184,10 +219,26 @@ function gameLoop() {
 
 document.addEventListener('keydown', e => {
     if (!gameOver) {
-        if (e.key === 'ArrowLeft' && dx === 0) { dx = -grid; dy = 0; }
-        else if (e.key === 'ArrowUp' && dy === 0) { dx = 0; dy = -grid; }
-        else if (e.key === 'ArrowRight' && dx === 0) { dx = grid; dy = 0; }
-        else if (e.key === 'ArrowDown' && dy === 0) { dx = 0; dy = grid; }
+        // Get the position where the head would be with the new direction
+        let newDx = dx, newDy = dy;
+        if (e.key === 'ArrowLeft' && dx === 0) { newDx = -grid; newDy = 0; }
+        else if (e.key === 'ArrowUp' && dy === 0) { newDx = 0; newDy = -grid; }
+        else if (e.key === 'ArrowRight' && dx === 0) { newDx = grid; newDy = 0; }
+        else if (e.key === 'ArrowDown' && dy === 0) { newDx = 0; newDy = grid; }
+
+        // Check if the new direction would cause collision with the segment behind the head
+        if (snake.length > 1) {
+            const newHeadX = snake[0].x + newDx;
+            const newHeadY = snake[0].y + newDy;
+            // If the new position matches the first body segment, ignore the input
+            if (newHeadX === snake[1].x && newHeadY === snake[1].y) {
+                return;
+            }
+        }
+
+        // Apply the new direction
+        dx = newDx;
+        dy = newDy;
     }
     if (gameOver && (e.key === 'r' || e.key === 'R')) {
         resetGame();
